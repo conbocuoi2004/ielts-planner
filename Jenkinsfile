@@ -49,6 +49,28 @@ pipeline {
                 }
             }
         }
+
+        stage('Update GitOps - dev') {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'github-push',
+                    usernameVariable: 'GUSER',
+                    passwordVariable: 'GTOKEN'
+                )]) {
+                    sh '''
+                      git config user.email "jenkins@ci.local"
+                      git config user.name "Jenkins CI"
+
+                      # Cập nhật tag trong values-dev.yaml bằng số build này
+                      sed -i "s|^  tag: .*|  tag: \\"$BUILD_NUMBER\\"|" chart/values-dev.yaml
+
+                      git add chart/values-dev.yaml
+                      git commit -m "ci: deploy build $BUILD_NUMBER to dev [skip ci]" || echo "Không có gì thay đổi"
+                      git push https://$GUSER:$GTOKEN@github.com/conbocuoi2004/ielts-planner.git HEAD:main
+                    '''
+                }
+            }
+        }
     }
 
     post {

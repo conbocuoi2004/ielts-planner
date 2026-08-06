@@ -1,7 +1,7 @@
 replicaCount: 1
 
 image:
-  tag: latest          # dev chạy bản mới nhất, chấp nhận rủi ro
+  tag: "8"          # dev chạy bản mới nhất, chấp nhận rủi ro
 
 service:
   nodePort: 30600      # cổng riêng cho dev
