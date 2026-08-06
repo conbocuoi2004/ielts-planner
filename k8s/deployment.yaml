@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ielts-planner
+  labels:
+    app: ielts-planner
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ielts-planner
+  template:
+    metadata:
+      labels:
+        app: ielts-planner
+    spec:
+      containers:
+        - name: ielts-planner
+          image: registry.conraddesign.uk/ielts/ielts-planner:latest
+          ports:
+            - containerPort: 5000
+          env:
+            - name: PORT
+              value: "5000"
+          livenessProbe:            # K8s hỏi "còn sống không?" — chết là restart
+            httpGet:
+              path: /health
+              port: 5000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          readinessProbe:           # "sẵn sàng nhận khách chưa?" — chưa thì đừng đưa traffic vào
+            httpGet:
+              path: /health
+              port: 5000
+            initialDelaySeconds: 3
+            periodSeconds: 5
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
