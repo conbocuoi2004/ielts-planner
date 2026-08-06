@@ -1,0 +1,6 @@
+apiVersion: v2
+name: ielts-planner
+description: IELTS study planner - time management, flashcards, 4 skills
+type: application
+version: 0.1.0        # phiên bản của CHART (bộ khuôn)
+appVersion: "1.0.0"   # phiên bản của APP bên trong

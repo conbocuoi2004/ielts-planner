@@ -1,0 +1,13 @@
+replicaCount: 2
+
+image:
+  tag: "8"             # prod GHIM phiên bản cụ thể — thay "8" bằng số build
+                       # mới nhất đang có trong Harbor của bạn (vào Harbor xem)
+
+service:
+  nodePort: 30500      # cổng prod — giữ cổng cũ
+
+resources:
+  limits:
+    cpu: 1000m
+    memory: 512Mi

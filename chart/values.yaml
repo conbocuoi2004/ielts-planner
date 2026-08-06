@@ -1,0 +1,20 @@
+replicaCount: 2
+
+image:
+  repository: registry.conraddesign.uk/ielts/ielts-planner
+  tag: latest          # CI sau này sẽ tự cập nhật dòng này!
+
+containerPort: 5000
+
+service:
+  type: NodePort
+  port: 80
+  nodePort: 30500
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+  limits:
+    cpu: 500m
+    memory: 256Mi
