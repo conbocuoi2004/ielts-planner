@@ -1,7 +1,7 @@
 replicaCount: 1
 
 image:
-  tag: "16"
+  tag: "17"
 
 service:
   nodePort: 30600      # cổng riêng cho dev
