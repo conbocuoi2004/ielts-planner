@@ -1,0 +1,12 @@
+{
+  "name": "ielts-planner",
+  "version": "1.0.0",
+  "description": "IELTS study planner - time management, schedule, flashcards, 4 skills",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.0"
+  }
+}
