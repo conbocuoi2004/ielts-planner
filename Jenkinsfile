@@ -6,6 +6,7 @@ pipeline {
         PROJECT  = "ielts"
         IMAGE    = "ielts-planner"
         FULL     = "${HARBOR}/${PROJECT}/${IMAGE}"
+        EC2_HOST = "ubuntu@<IP-PUBLIC-EC2>"        // ← THAY IP thật của EC2 vào đây
     }
 
     stages {
@@ -61,7 +62,6 @@ pipeline {
                       git config user.email "jenkins@ci.local"
                       git config user.name "Jenkins CI"
 
-                      # Cập nhật tag trong values-dev.yaml bằng số build này
                       sed -i "s|^  tag: .*|  tag: \\"$BUILD_NUMBER\\"|" chart/values-dev.yaml
 
                       git add chart/values-dev.yaml
@@ -71,11 +71,35 @@ pipeline {
                 }
             }
         }
+
+        stage('Deploy to EC2 prod') {
+            steps {
+                // Cổng phê duyệt: Jenkins dừng chờ, vào UI bấm Proceed mới deploy.
+                // Muốn full tự động thì xóa dòng input bên dưới.
+                input message: "Deploy build ${BUILD_NUMBER} lên production (ielts.conraddesign.uk)?"
+
+                sshagent(credentials: ['ec2-ssh']) {
+                    sh '''
+                      ssh -o StrictHostKeyChecking=no $52.62.194.218 "
+                        docker pull $FULL:$BUILD_NUMBER &&
+                        docker rm -f ielts-app &&
+                        docker run -d --name ielts-app \
+                          --restart unless-stopped \
+                          --network web \
+                          --memory=150m \
+                          -v /opt/ielts-data:/app/data \
+                          $FULL:$BUILD_NUMBER
+                      "
+                    '''
+                }
+            }
+        }
     }
 
     post {
-        success { echo "✅ Đã push $FULL:$BUILD_NUMBER lên Harbor" }
+        success { echo "✅ Build $BUILD_NUMBER: dev (GitOps) + prod (ielts.conraddesign.uk) đã cập nhật" }
         failure { echo '❌ Lỗi — xem Console Output stage đỏ' }
+        aborted { echo '⏹ Build bị hủy (có thể do từ chối phê duyệt prod)' }
         always  { sh 'docker rm -f ielts-test 2>/dev/null || true' }
     }
 }
